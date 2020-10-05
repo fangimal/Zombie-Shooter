@@ -5,9 +5,11 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour
 {
     Player player;
+    //PlayerController2 player;
     Vector3 offset;
     void Start()
     {
+        //player = FindObjectOfType<PlayerController2>();
         player = FindObjectOfType<Player>();
         offset = transform.position - player.transform.position;
     }

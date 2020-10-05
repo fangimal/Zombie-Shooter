@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed;
     public Transform gunBarrel;
+    public Joystick joystick;
 
     NavMeshAgent navMeshAgent;
     Cursor cursor;
@@ -35,7 +36,7 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow))
             dir.z = -5.0f;
         if (Input.GetKey(KeyCode.DownArrow))
-            dir.z = 2.0f;
+            dir.z = 5.0f;
         navMeshAgent.velocity = dir.normalized * moveSpeed;
 
         if (Input.GetMouseButtonDown(0))
@@ -53,12 +54,17 @@ public class Player : MonoBehaviour
 
             if (hit.transform != null)
             {
-                var zombie = hit.transform.GetComponent<Enemie>();
+                var zombie = hit.transform.GetComponent<Enemy>();
                 if (zombie != null)
                     zombie.Kill();
             }
 
             shot.Show(from, to);
         }
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 }

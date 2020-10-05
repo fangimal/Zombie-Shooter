@@ -12,6 +12,9 @@ ModelImporter:
   - first:
       74: -1098847954737581102
     second: Bone|Walk
+  - first:
+      74: 1853792934652792846
+    second: Bone|Walk (1)
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -58,7 +61,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
