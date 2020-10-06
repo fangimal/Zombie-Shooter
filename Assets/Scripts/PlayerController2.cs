@@ -9,7 +9,7 @@ public class PlayerController2 : MonoBehaviour
     public float moveSpeed = 1f;
     public float rotationSpeed = 5f;
     public float JumpForce = 1f;
-    public string nearest; //Имя ближайшего врага
+    //public string nearest; //Имя ближайшего врага
 
     private Rigidbody rb;
     private new CapsuleCollider collider; 
@@ -17,41 +17,67 @@ public class PlayerController2 : MonoBehaviour
     GameObject[] enemy;
     GameObject closest; //ближайший враг
     Animator animator;
+    Shot shot;
 
     public LayerMask GroundLayer = 1;
     public Joystick joystick;
-    //public Transform gunBarrel;
+    public Transform gunBarrel; 
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         collider = GetComponent<CapsuleCollider>();
         animator = GetComponentInChildren<Animator>();
-
         enemy = GameObject.FindGameObjectsWithTag("Enemy");
+        shot = FindObjectOfType<Shot>();
 
-        //т.к. нам не нужно что бы персонаж мог падать сам по-себе без нашего на то указания.
-        //то нужно заблочить поворот по осях X и Z
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
         //  Защита от дурака
         if (GroundLayer == gameObject.layer)
-            Debug.LogError("Player SortingLayer must be different from Ground SourtingLayer!");
+            Debug.LogError("Слой сортировки игроков должен отличаться от слоя сортировки Земли!");
     }
     private void Update()
     {
-        Vector3 direction = FindClosesEnemy().transform.position - transform.position;
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+        if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0) 
+        {
+            TurnToTheEnemy();
+        }
+
 
         //transform.rotation = Quaternion.LookRotation(rb.velocity.normalized);
 
         //transform.rotation =Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
 
-        nearest = FindClosesEnemy().name;
+        //nearest = FindClosesEnemy().name; //Пишем имя врага
 
         animator.SetFloat("speed", rb.velocity.magnitude);
-        
+
+        //Стрельба
+        if (Input.GetMouseButtonDown(0))
+        {
+            var from = gunBarrel.position;
+            var target = enemy[0].transform.position;
+            var to = new Vector3(target.x, from.y, target.z);
+
+            var direction1 = (to - from).normalized;
+
+            RaycastHit hit;
+            if (Physics.Raycast(from, to - from, out hit, 100))
+                to = new Vector3(hit.point.x, from.y, hit.point.z);
+            else
+                to = from + direction1 * 100;
+
+            if (hit.transform != null)
+            {
+                var zombie = hit.transform.GetComponent<Enemy>();
+                if (zombie != null)
+                    zombie.Kill();
+            }
+            shot.Show(from, to);
+        }
+
     }
     void FixedUpdate()
     {
@@ -59,7 +85,14 @@ public class PlayerController2 : MonoBehaviour
         MoveLogic();
     }
 
-    GameObject FindClosesEnemy()
+    void TurnToTheEnemy() //Поворот к врагу
+    {
+        Vector3 direction = FindClosesEnemy().transform.position - transform.position;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+    }
+
+    GameObject FindClosesEnemy() //Поиск ближайшего врага
     {
         float distance = Mathf.Infinity;  //Mathf.Infinity
         Vector3 position = transform.position;
