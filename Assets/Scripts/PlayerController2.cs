@@ -6,110 +6,114 @@ using UnityEngine.AI;
 
 public class PlayerController2 : MonoBehaviour
 {
-    public float moveSpeed = 1f;
-    public float rotationSpeed = 5f;
-    public float JumpForce = 1f;
-    //public string nearest; //Имя ближайшего врага
-
-    private Rigidbody rb;
-    private new CapsuleCollider collider; 
-
-    GameObject[] enemy;
-    GameObject closest; //ближайший враг
-    Animator animator;
-    Shot shot;
+    public SelectControl selectControl; //Выбираем вид управления
+    public enum SelectControl  { Joystic, Keyboard }
 
     public LayerMask GroundLayer = 1;
     public Joystick joystick;
-    public Transform gunBarrel; 
+    public Transform gunBarrel;
 
+    public float moveSpeed = 1f;
+    //public float jumpForce = 1f;
+    public byte bulletCount;
+    
+
+    Rigidbody rb;
+    new CapsuleCollider collider;
+    Vector3 moveDirection; //MovementVector() вспомогательная переменная
+    Animator anim;
+    Shot shot;
+    EnemyDetect enemyDetect;
+
+    private float rotationSpeed = 5f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         collider = GetComponent<CapsuleCollider>();
-        animator = GetComponentInChildren<Animator>();
-        enemy = GameObject.FindGameObjectsWithTag("Enemy");
         shot = FindObjectOfType<Shot>();
+        enemyDetect = GetComponent<EnemyDetect>();
 
+        anim = GetComponentInChildren<Animator>();
+        
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
         //  Защита от дурака
         if (GroundLayer == gameObject.layer)
             Debug.LogError("Слой сортировки игроков должен отличаться от слоя сортировки Земли!");
     }
-    private void Update()
+    void Update()
     {
-        if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0) 
-        {
-            TurnToTheEnemy();
-        }
-
-
-        //transform.rotation = Quaternion.LookRotation(rb.velocity.normalized);
-
-        //transform.rotation =Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-
-        //nearest = FindClosesEnemy().name; //Пишем имя врага
-
-        animator.SetFloat("speed", rb.velocity.magnitude);
-
-        //Стрельба
-        if (Input.GetMouseButtonDown(0))
-        {
-            var from = gunBarrel.position;
-            var target = enemy[0].transform.position;
-            var to = new Vector3(target.x, from.y, target.z);
-
-            var direction1 = (to - from).normalized;
-
-            RaycastHit hit;
-            if (Physics.Raycast(from, to - from, out hit, 100))
-                to = new Vector3(hit.point.x, from.y, hit.point.z);
-            else
-                to = from + direction1 * 100;
-
-            if (hit.transform != null)
-            {
-                var zombie = hit.transform.GetComponent<Enemy>();
-                if (zombie != null)
-                    zombie.Kill();
-            }
-            shot.Show(from, to);
-        }
-
+        AnimLogic();
+        //TurnLogic();
     }
+
     void FixedUpdate()
     {
-        JumpLogic();
         MoveLogic();
+        //ShotLogic();
+        //JumpLogic();  
     }
 
-    void TurnToTheEnemy() //Поворот к врагу
+    void AnimLogic() //Правила переключения анимации
     {
-        Vector3 direction = FindClosesEnemy().transform.position - transform.position;
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+        if (rb.velocity.magnitude > 1.5f && bulletCount > 0)
+            anim.SetBool("walkattack", true);
+        else if (rb.velocity.magnitude < 1f)
+            anim.SetBool("walkattack", false);
+        else if (rb.velocity.magnitude > 1f && bulletCount == 0)
+            anim.SetBool("walk", true);
     }
 
-    GameObject FindClosesEnemy() //Поиск ближайшего врага
+    //void ShotLogic() //Стрельба
+    //{
+    //    if (bulletCount > 0)
+    //    {
+    //        if (Input.GetMouseButtonDown(0))
+    //        {
+    //            bulletCount --;
+    //            Vector3 from = gunBarrel.position;
+    //            Vector3 target = enemy[0].transform.position;
+
+    //            Vector3 to = new Vector3(target.x, from.y, target.z);
+
+    //            Vector3 direction1 = (to - from).normalized;
+
+    //            RaycastHit hit;
+    //            if (Physics.Raycast(from, to - from, out hit, 100))
+    //                to = new Vector3(hit.point.x, from.y, hit.point.z);
+    //            else
+    //                to = from + direction1 * 100;
+
+    //            if (hit.transform != null)
+    //            {
+    //                var zombie = hit.transform.GetComponent<Enemy>();
+    //                if (zombie != null)
+    //                    zombie.Kill();
+    //            }
+    //            shot.Show(from, to);
+    //        }
+    //    }
+    //}
+
+
+    void TurnLogic() //Поворот 
     {
-        float distance = Mathf.Infinity;  //Mathf.Infinity
-        Vector3 position = transform.position;
-        foreach (GameObject go in enemy)
+        enemyDetect.EnemyIsNear(); //Проверяем близко ли враг
+        //Если есть враг поворачивает к нему
+        if (enemyDetect.enemyIsNear)
         {
-            Vector3 diff = go.transform.position - position;
-            float curDistance = diff.sqrMagnitude;
-            if (curDistance < distance)
-            {
-                closest = go;
-                distance = curDistance;
-            }
+            Vector3 direction = enemyDetect.closest.transform.position - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
         }
-        
-        return closest;
+        else  //Иначе в сторону движения
+        {
+            transform.LookAt(moveDirection + transform.position);
+        }
     }
-    private bool IsGrounded
+
+    bool IsGrounded
     {
         get
         {
@@ -125,31 +129,39 @@ public class PlayerController2 : MonoBehaviour
         }
     }
 
-    private Vector3 MovementVector
+    Vector3 MovementVector
     {
         get
         {
-            float horizontal = joystick.Horizontal;
-            float vertical = joystick.Vertical;
-
-            //float horizontal = Input.GetAxis("Horizontal");
-            //float vertical = Input.GetAxis("Vertical");
-
-            return new Vector3(horizontal, 0.0f, vertical);
+            float horizontal, vertical;
+            if (selectControl == 0)
+            {
+                horizontal = joystick.Horizontal;
+                vertical = joystick.Vertical;
+                moveDirection = new Vector3(horizontal, 0.0f, vertical);
+                return moveDirection;
+            }
+            else 
+            {
+                horizontal = Input.GetAxis("Horizontal");
+                vertical = Input.GetAxis("Vertical");
+                moveDirection = new Vector3(horizontal, 0.0f, vertical);
+                return new Vector3(horizontal, 0.0f, vertical);
+            }
         }
     }
-
-
-    private void MoveLogic()
+ 
+    void MoveLogic()
     {
         rb.AddForce(MovementVector * moveSpeed, ForceMode.Impulse);
+        //print(rb.AddForce);
     }
-    private void JumpLogic()
-    {
-        if (IsGrounded && (Input.GetAxis("Jump") > 0))
-        {
-            rb.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
-        }
-    }
+    //void JumpLogic()
+    //{
+    //    if (IsGrounded && (Input.GetAxis("Jump") > 0))
+    //    {
+    //        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    //    }
+    //}
 }
 

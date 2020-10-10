@@ -11,7 +11,10 @@ public class Enemy : MonoBehaviour
     CapsuleCollider capsuleCollider;
     Animator animator;
     MovementAnimator movementAnimator;
+
     bool dead;
+
+    Transform enemy;
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -21,6 +24,9 @@ public class Enemy : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         animator = GetComponentInChildren<Animator>();
         movementAnimator = GetComponent<MovementAnimator>();
+
+        enemy = GetComponent<Transform>();
+        EnemyManager.Instance.RegisterEnemy(this);
     }
 
     // Update is called once per frame
