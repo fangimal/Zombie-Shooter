@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviour
+public class EnemyManager : Loader<EnemyManager>
 {
-    public static EnemyManager instanse = null; //*4 EnemySpawner появляется не сразу
     //public float Period;
     //public GameObject Enemy;
-
-    public GameObject spawnPoint; //*4 Где должны появляться противники
-    public GameObject[] enemies; //*4
-    public int maxEnemiesOfScreen; //*4 Максимально на сцене в один момент могут быть врагов
-    public int totalEnemies; //*4 Всего за уровень будут врагов
-    public int enemiesPerSpawn; //*4 Сколько одновременно могут появляться враги
+    [SerializeField]
+    GameObject spawnPoint; //*4 Где должны появляться противники
+    [SerializeField] 
+    GameObject[] enemies; //*4
+    [SerializeField] 
+    int maxEnemiesOfScreen; //*4 Максимально на сцене в один момент могут быть врагов
+    [SerializeField] 
+    int totalEnemies; //*4 Всего за уровень будут врагов
+    [SerializeField] 
+    int enemiesPerSpawn; //*4 Сколько одновременно могут появляться враги
 
     public List<Enemy> EnemyList = new List<Enemy>(); //Собирает всех врагов в Список
 
@@ -21,20 +24,14 @@ public class EnemyManager : MonoBehaviour
 
     float TimeUntilNextSpawn;
 
-    void Awake() //*4
-    {
-        if (instanse == null) instanse = this; //*4 Создать этот элемент
-        else if (instanse != this) Destroy(gameObject); //Если менеджер не должен создоваться то созданный новый менеджер должен удалится 
 
-        DontDestroyOnLoad(gameObject); //При загрузке менеджер должен оставаться на сцене
-    }
     void Start()
     {
         //TimeUntilNextSpawn = Random.Range(0, Period);
-        Spawn();
+        spawnPoint = GameObject.FindWithTag("Respawn"); //
+        StartCoroutine(Spawn());
     }
 
-    
     void Update()
     {
         //TimeUntilNextSpawn -= Time.deltaTime;
@@ -53,7 +50,7 @@ public class EnemyManager : MonoBehaviour
             {
                 if (EnemyList.Count < maxEnemiesOfScreen)
                 {
-                    GameObject newEnemy = Instantiate(enemies[1]);
+                    GameObject newEnemy = Instantiate(enemies[0]);
                     newEnemy.transform.position = spawnPoint.transform.position;
                 }
             }
