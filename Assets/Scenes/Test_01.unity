@@ -2034,7 +2034,8 @@ MonoBehaviour:
   joystick: {fileID: 1639146422}
   gunBarrel: {fileID: 954731366}
   moveSpeed: 1
-  bulletCount: 10
+  jumpForce: 1
+  bulletCount: 100
 --- !u!136 &843556334
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2077,11 +2078,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d49a90f2b32eb4593da7a6f2d5a22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyIsNear: 0
-  enemyLive: 0
   attackRadius: 10
   nearest: {fileID: 941606461}
-  closest: {fileID: 0}
+  targetEnemy: {fileID: 0}
 --- !u!4 &930428940 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8974880820737451146, guid: e73a2cd219b7a624eb200374e30d6f81, type: 3}
@@ -3086,6 +3085,14 @@ PrefabInstance:
     - target: {fileID: 4066200396874044742, guid: 7b72a4efe7b03274ea1ee549578df249, type: 3}
       propertyPath: enemiesPerSpawn
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066200396874044742, guid: 7b72a4efe7b03274ea1ee549578df249, type: 3}
+      propertyPath: maxEnemiesOfScreen
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066200396874044742, guid: 7b72a4efe7b03274ea1ee549578df249, type: 3}
+      propertyPath: totalEnemies
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4066200396874044743, guid: 7b72a4efe7b03274ea1ee549578df249, type: 3}
       propertyPath: m_LocalPosition.x

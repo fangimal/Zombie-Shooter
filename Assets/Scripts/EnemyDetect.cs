@@ -5,21 +5,18 @@ using UnityEngine.UI;
 
 public class EnemyDetect : MonoBehaviour
 {
-    public bool enemyIsNear = false; //Враг рядом
-    public bool enemyLive = false;   //
     public float attackRadius = 10f; //*4 Минимальное расстояние до противника
 
     float attackCounter; //*4 Счётчик для стрельбы , скорострельность
 
     public Text nearest;
-    Enemy targetEnemy = null; //*4 Враг - Цель
+    public Enemy targetEnemy = null; //*4 Враг - Цель
     
 
     GameObject[] enemy;
-    public GameObject closest; //ближайший враг
     void Start()
     {
-        enemy = GameObject.FindGameObjectsWithTag("Enemy"); 
+
     }
 
     void Update()
@@ -40,11 +37,10 @@ public class EnemyDetect : MonoBehaviour
             targetEnemy = null;
         }
 
-        EnemyLive();
-        if (enemyLive)
+        if (targetEnemy!=null)
         {
-            float distance = Vector3.Distance(FindClosesEnemy().transform.localPosition, transform.localPosition);
-            nearest.text = closest.name + " " + distance.ToString(); //Пишем имя врага
+            float distance = Vector3.Distance(targetEnemy.transform.localPosition, transform.localPosition);
+            nearest.text = targetEnemy.name + " " + distance.ToString(); //Пишем имя врага
         }
         else nearest.text = "Врагов нет!";
     }
@@ -88,47 +84,5 @@ public class EnemyDetect : MonoBehaviour
             }
         }
         return nearestEnemy;
-    }
-    public void EnemyIsNear() //Проверяем близко ли враг
-    {
-        if (GameObject.FindGameObjectsWithTag("Enemy") == null) enemyIsNear = false;
-        else
-        {
-            FindClosesEnemy();
-            float distance = Vector3.Distance(closest.transform.localPosition, transform.localPosition); //Дистанция до врага
-                                                                                               //GameObject.FindGameObjectsWithTag("Enemy").Length > 0
-            if (distance < attackRadius)
-            {
-                enemyIsNear = true;
-            }
-            else enemyIsNear = false;
-        }
-    }
-
-    GameObject FindClosesEnemy() //Поиск ближайшего врага
-    {
-        float distance = Mathf.Infinity;  //Mathf.Infinity
-        Vector3 position = transform.localPosition;
-        foreach (GameObject go in enemy)
-        {
-            Vector3 diff = go.transform.localPosition - position;
-            float curDistance = diff.sqrMagnitude;
-            if (curDistance < distance)
-            {
-                closest = go;
-                distance = curDistance;
-            }
-        }
-        return closest;
-    }
-    public bool EnemyLive() // есть ли враги
-    {
-        if (closest == null || GameObject.FindGameObjectWithTag("Enemy"))
-        {
-            FindClosesEnemy();
-            return enemyLive = true;
-        }
-        return enemyLive = false;
-    }
-    
+    } 
 }

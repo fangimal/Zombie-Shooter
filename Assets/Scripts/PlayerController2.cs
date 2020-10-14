@@ -14,10 +14,9 @@ public class PlayerController2 : MonoBehaviour
     public Transform gunBarrel;
 
     public float moveSpeed = 1f;
-    //public float jumpForce = 1f;
+    public float jumpForce = 1f;
     public byte bulletCount;
     
-
     Rigidbody rb;
     new CapsuleCollider collider;
     Vector3 moveDirection; //MovementVector() вспомогательная переменная
@@ -26,7 +25,6 @@ public class PlayerController2 : MonoBehaviour
     EnemyDetect enemyDetect;
 
     private float rotationSpeed = 5f;
-
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -45,13 +43,13 @@ public class PlayerController2 : MonoBehaviour
     void Update()
     {
         AnimLogic();
-        //TurnLogic();
+        TurnLogic();
     }
 
     void FixedUpdate()
     {
         MoveLogic();
-        //ShotLogic();
+        ShotLogic();
         //JumpLogic();  
     }
 
@@ -65,45 +63,42 @@ public class PlayerController2 : MonoBehaviour
             anim.SetBool("walk", true);
     }
 
-    //void ShotLogic() //Стрельба
-    //{
-    //    if (bulletCount > 0)
-    //    {
-    //        if (Input.GetMouseButtonDown(0))
-    //        {
-    //            bulletCount --;
-    //            Vector3 from = gunBarrel.position;
-    //            Vector3 target = enemy[0].transform.position;
+    void ShotLogic() //Стрельба
+    {
+        if (bulletCount > 0)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                bulletCount--;
+                Vector3 from = gunBarrel.position;
+                Vector3 target = enemyDetect.targetEnemy.transform.position;
 
-    //            Vector3 to = new Vector3(target.x, from.y, target.z);
+                Vector3 to = new Vector3(target.x, from.y, target.z);
 
-    //            Vector3 direction1 = (to - from).normalized;
+                Vector3 direction1 = (to - from).normalized;
 
-    //            RaycastHit hit;
-    //            if (Physics.Raycast(from, to - from, out hit, 100))
-    //                to = new Vector3(hit.point.x, from.y, hit.point.z);
-    //            else
-    //                to = from + direction1 * 100;
+                RaycastHit hit;
+                if (Physics.Raycast(from, to - from, out hit, 100))
+                    to = new Vector3(hit.point.x, from.y, hit.point.z);
+                else
+                    to = from + direction1 * 100;
 
-    //            if (hit.transform != null)
-    //            {
-    //                var zombie = hit.transform.GetComponent<Enemy>();
-    //                if (zombie != null)
-    //                    zombie.Kill();
-    //            }
-    //            shot.Show(from, to);
-    //        }
-    //    }
-    //}
-
-
+                if (hit.transform != null)
+                {
+                    var zombie = hit.transform.GetComponent<Enemy>();
+                    if (zombie != null)
+                        zombie.Kill();
+                }
+                shot.Show(from, to);
+            }
+        }
+    }
     void TurnLogic() //Поворот 
     {
-        enemyDetect.EnemyIsNear(); //Проверяем близко ли враг
         //Если есть враг поворачивает к нему
-        if (enemyDetect.enemyIsNear)
+        if (enemyDetect.targetEnemy != null)
         {
-            Vector3 direction = enemyDetect.closest.transform.position - transform.position;
+            Vector3 direction = enemyDetect.targetEnemy.transform.position - transform.position;
             Quaternion rotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
         }
@@ -154,14 +149,14 @@ public class PlayerController2 : MonoBehaviour
     void MoveLogic()
     {
         rb.AddForce(MovementVector * moveSpeed, ForceMode.Impulse);
-        //print(rb.AddForce);
     }
-    //void JumpLogic()
-    //{
-    //    if (IsGrounded && (Input.GetAxis("Jump") > 0))
-    //    {
-    //        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-    //    }
-    //}
+
+    void JumpLogic()
+    {
+        if (IsGrounded && (Input.GetAxis("Jump") > 0))
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
 }
 

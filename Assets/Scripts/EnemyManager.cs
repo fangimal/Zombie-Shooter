@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,6 @@ public class EnemyManager : Loader<EnemyManager>
 
     public List<Enemy> EnemyList = new List<Enemy>(); //Собирает всех врагов в Список
 
-    //int enemiesOnScreen = 0; //*4 Изначальное количество врагов
     const float spawnDelay = 0.5f; //*4
 
     float TimeUntilNextSpawn;
@@ -34,12 +34,7 @@ public class EnemyManager : Loader<EnemyManager>
 
     void Update()
     {
-        //TimeUntilNextSpawn -= Time.deltaTime;
-        //if (TimeUntilNextSpawn <= 0.0f)
-        //{
-        //    TimeUntilNextSpawn = Period;
-        //    Instantiate(Enemy, transform.position, transform.rotation);
-        //}
+
     }
 
     IEnumerator Spawn() //*4
@@ -75,7 +70,7 @@ public class EnemyManager : Loader<EnemyManager>
     {
         foreach (Enemy enemy in EnemyList)
         {
-            Destroy(enemy.gameObject);
+            Destroy(enemy.gameObject, 1);
         }
 
         EnemyList.Clear(); //Очищаем список для создания нового

@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour
     CapsuleCollider capsuleCollider;
     Animator animator;
     MovementAnimator movementAnimator;
+    EnemyManager enemyManager;
 
     bool dead;
 
@@ -24,6 +25,7 @@ public class Enemy : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         animator = GetComponentInChildren<Animator>();
         movementAnimator = GetComponent<MovementAnimator>();
+        enemyManager = FindObjectOfType<EnemyManager>();
 
         enemy = GetComponent<Transform>();
         EnemyManager.Instance.RegisterEnemy(this);
@@ -48,7 +50,9 @@ public class Enemy : MonoBehaviour
             Destroy(navMeshAgent);
             GetComponentInChildren<ParticleSystem>().Play();
             animator.SetTrigger("died");
-            Destroy(gameObject, 2);
+            //enemyManager.UnregisterEnemy();
+            enemyManager.DestroyEnemies();
+           // Destroy(gameObject, 2);
         }
     }
 }
