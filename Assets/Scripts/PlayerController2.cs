@@ -87,7 +87,7 @@ public class PlayerController2 : MonoBehaviour
                 {
                     var zombie = hit.transform.GetComponent<Enemy>();
                     if (zombie != null)
-                        zombie.Kill();
+                        zombie.EnemyHit(1);
                 }
                 shot.Show(from, to);
             }

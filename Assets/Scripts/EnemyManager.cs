@@ -70,7 +70,7 @@ public class EnemyManager : Loader<EnemyManager>
     {
         foreach (Enemy enemy in EnemyList)
         {
-            Destroy(enemy.gameObject, 1);
+            Destroy(enemy.gameObject, 2);
         }
 
         EnemyList.Clear(); //Очищаем список для создания нового

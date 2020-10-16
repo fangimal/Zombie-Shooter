@@ -13,7 +13,10 @@ public class Enemy : MonoBehaviour
     MovementAnimator movementAnimator;
     EnemyManager enemyManager;
 
-    bool dead;
+    [SerializeField]
+    int helth;
+
+    bool dead = false;
 
     Transform enemy;
     void Start()
@@ -34,12 +37,13 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (dead) return;
-
-        navMeshAgent.SetDestination(player.transform.position);
-        transform.rotation = Quaternion.LookRotation(navMeshAgent.velocity.normalized);
+        if (dead == false) 
+        {
+            navMeshAgent.SetDestination(player.transform.position);
+            transform.rotation = Quaternion.LookRotation(navMeshAgent.velocity.normalized);
+        }
+        
     }
-
     public void Kill()
     {
         if (!dead)
@@ -52,7 +56,25 @@ public class Enemy : MonoBehaviour
             animator.SetTrigger("died");
             //enemyManager.UnregisterEnemy();
             enemyManager.DestroyEnemies();
-           // Destroy(gameObject, 2);
+           //Destroy(gameObject, 2);
         }
+    }
+
+    public void EnemyHit(int hitPoints)
+    {
+        if(helth - hitPoints > 0)
+        {
+            helth -= hitPoints;
+            Kill();
+        }
+        else
+        {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        dead = true;
     }
 }
