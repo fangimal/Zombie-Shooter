@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2842834400898790767}
   - component: {fileID: 5762325842593453630}
   m_Layer: 0
-  m_Name: SphereTellow
+  m_Name: SphereYellow
   m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,5 +108,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b377cadf3b1426743bfd552c708f0fca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackDamage: 10
+  attackDamage: 11
   pType: 1
