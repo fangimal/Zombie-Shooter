@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EnemyDetect : MonoBehaviour
+public class EnemyDetect : MonoBehaviour  //TowerControl
 {
-    public float attackRadius = 10f; //*4 Минимальное расстояние до противника
+    [SerializeField]
+    float timeBetweenAttacks; //*11
+    [SerializeField]
+    float attackRadius = 10f; //*4 Минимальное расстояние до противника
 
     float attackCounter; //*4 Счётчик для стрельбы , скорострельность
 
     public Text nearest;
     public Enemy targetEnemy = null; //*4 Враг - Цель
+    Projectile projectile; //*11
     
-
     GameObject[] enemy;
     void Start()
     {

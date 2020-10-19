@@ -45,7 +45,7 @@ public class EnemyManager : Loader<EnemyManager>
             {
                 if (EnemyList.Count < maxEnemiesOfScreen)
                 {
-                    GameObject newEnemy = Instantiate(enemies[0]);
+                    GameObject newEnemy = Instantiate(enemies[0]) as GameObject;
                     newEnemy.transform.position = spawnPoint.transform.position;
                 }
             }
@@ -56,14 +56,15 @@ public class EnemyManager : Loader<EnemyManager>
     }
 
     public void RegisterEnemy(Enemy enemy) //Добавляем врагов в Лист
-    {
-        EnemyList.Add(enemy);
+    {  //Регистрируем противников в листе, в скрипте Enemy
+  
+    EnemyList.Add(enemy);
     }
 
     public void UnregisterEnemy(Enemy enemy) //Удаляем врагов из Листа
     {
         EnemyList.Remove(enemy);
-        Destroy(enemy.gameObject);
+        Destroy(enemy.gameObject); //Убираем противника из списка
     }
 
     public void DestroyEnemies() //Уловие Уничтожения противников

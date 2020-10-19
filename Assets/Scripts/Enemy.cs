@@ -31,7 +31,7 @@ public class Enemy : MonoBehaviour
         enemyManager = FindObjectOfType<EnemyManager>();
 
         enemy = GetComponent<Transform>();
-        EnemyManager.Instance.RegisterEnemy(this);
+        EnemyManager.Instance.RegisterEnemy(this); //Регистрируем противников в листе
     }
 
     // Update is called once per frame
@@ -54,9 +54,9 @@ public class Enemy : MonoBehaviour
             Destroy(navMeshAgent);
             GetComponentInChildren<ParticleSystem>().Play();
             animator.SetTrigger("died");
-            //enemyManager.UnregisterEnemy();
             enemyManager.DestroyEnemies();
-           //Destroy(gameObject, 2);
+            enemyManager.UnregisterEnemy(this);
+            //Destroy(gameObject, 2);
         }
     }
 
